@@ -9,7 +9,7 @@ interface EditDeliveryForm {
   name: string;
   carrier: string;
   trackingNumber: string;
-  manualDeliveryDate?: Date;
+  manualDeliveryDate?: Date | null;
 }
 
 export default function EditDeliveryView({
@@ -46,7 +46,7 @@ export default function EditDeliveryView({
       delivery.name = deliveryForm.name;
       delivery.trackingNumber = deliveryForm.trackingNumber;
       delivery.carrier = deliveryForm.carrier;
-      delivery.manualDeliveryDate = deliveryForm.manualDeliveryDate;
+      delivery.manualDeliveryDate = deliveryForm.manualDeliveryDate ?? undefined;
 
       await setDeliveries(deliveries);
 

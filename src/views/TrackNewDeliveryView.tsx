@@ -9,7 +9,7 @@ interface AddDeliveryForm {
   name: string;
   carrier: string;
   trackingNumber: string;
-  manualDeliveryDate?: Date;
+  manualDeliveryDate?: Date | null;
 }
 
 export default function TrackNewDeliveryView({
@@ -32,7 +32,7 @@ export default function TrackNewDeliveryView({
         name: deliveryForm.name,
         trackingNumber: deliveryForm.trackingNumber,
         carrier: deliveryForm.carrier,
-        manualDeliveryDate: deliveryForm.manualDeliveryDate,
+        manualDeliveryDate: deliveryForm.manualDeliveryDate ?? undefined,
       };
       await setDeliveries((deliveries || []).concat(delivery));
 
