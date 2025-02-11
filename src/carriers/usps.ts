@@ -6,6 +6,10 @@ export async function ableToTrackUspsRemotely(): Promise<boolean> {
   return false;
 }
 
+export function urlToUspsTrackingWebpage(delivery: Delivery): string {
+  return `https://tools.usps.com/go/TrackConfirmAction_input?qtc_tLabels1=${delivery.trackingNumber}`;
+}
+
 export async function updateUspsTracking(delivery: Delivery): Promise<Package[]> {
   const trackingNumber = delivery.trackingNumber;
 

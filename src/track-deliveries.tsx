@@ -86,6 +86,10 @@ export default function TrackDeliveriesCommand() {
                   icon={Icon.MagnifyingGlass}
                   target={<ShowDetailsView delivery={delivery} packages={packages[delivery.id]?.packages ?? []} />}
                 />
+                <Action.OpenInBrowser
+                  url={carriers.get(delivery.carrier)?.urlToTrackingWebpage(delivery) ?? ""}
+                  shortcut={Keyboard.Shortcut.Common.Open}
+                />
                 <Action.CopyToClipboard
                   title="Copy Tracking Number"
                   shortcut={Keyboard.Shortcut.Common.Copy}
