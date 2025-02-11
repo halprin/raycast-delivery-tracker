@@ -169,7 +169,7 @@ async function refreshTracking(
     }
 
     try {
-      const refreshedPackages = await carrier.updateTracking(delivery.trackingNumber);
+      const refreshedPackages = await carrier.updateTracking(delivery);
 
       setPackages((packagesMap) => {
         packagesMap[delivery.id] = {

@@ -1,18 +1,21 @@
 import { Package } from "../package";
+import { Delivery } from "../delivery";
 
 export async function ableToTrackUspsRemotely(): Promise<boolean> {
   // doesn't support remote tracking yet.
   return false;
 }
 
-export async function updateUspsTracking(trackingNumber: string): Promise<Package[]> {
+export async function updateUspsTracking(delivery: Delivery): Promise<Package[]> {
+  const trackingNumber = delivery.trackingNumber;
+
   console.log(`Updating tracking for ${trackingNumber}`);
 
   console.log(`Updated tracking for ${trackingNumber}`);
 
   return [{
-    delivered: false,
-    deliveryDate: new Date(),
+    delivered: new Date() === delivery.manualDeliveryDate,
+    deliveryDate: delivery.manualDeliveryDate,
     activity: [],
   }];
 }

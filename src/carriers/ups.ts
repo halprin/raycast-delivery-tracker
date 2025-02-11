@@ -2,6 +2,7 @@ import { Package } from "../package";
 import { getPreferenceValues, Cache } from "@raycast/api";
 import fetch from "node-fetch";
 import { randomUUID } from "node:crypto";
+import { Delivery } from "../delivery";
 
 const cache = new Cache();
 const cacheKey = "upsLogin";
@@ -16,7 +17,9 @@ export async function ableToTrackUpsRemotely(): Promise<boolean> {
   return Boolean(clientId && clientSecret);
 }
 
-export async function updateUpsTracking(trackingNumber: string): Promise<Package[]> {
+export async function updateUpsTracking(delivery: Delivery): Promise<Package[]> {
+  const trackingNumber = delivery.trackingNumber;
+
   console.log(`Updating tracking for ${trackingNumber}`);
 
   const preferences = getPreferenceValues<Preferences.TrackDeliveries>();

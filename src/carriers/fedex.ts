@@ -1,6 +1,7 @@
 import { Package } from "../package";
 import { Cache, getPreferenceValues } from "@raycast/api";
 import fetch from "node-fetch";
+import { Delivery } from "../delivery";
 
 const cache = new Cache();
 const cacheKey = "fedexLogin";
@@ -15,7 +16,9 @@ export async function ableToTrackFedexRemotely(): Promise<boolean> {
   return Boolean(apiKey && secretKey);
 }
 
-export async function updateFedexTracking(trackingNumber: string): Promise<Package[]> {
+export async function updateFedexTracking(delivery: Delivery): Promise<Package[]> {
+  const trackingNumber = delivery.trackingNumber;
+
   console.log(`Updating tracking for ${trackingNumber}`);
 
   const preferences = getPreferenceValues<Preferences.TrackDeliveries>();

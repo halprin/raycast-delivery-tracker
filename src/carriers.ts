@@ -3,12 +3,13 @@ import { Package } from "./package";
 import { updateUspsTracking, ableToTrackUspsRemotely } from "./carriers/usps";
 import { updateUpsTracking, ableToTrackUpsRemotely } from "./carriers/ups";
 import { updateFedexTracking, ableToTrackFedexRemotely} from "./carriers/fedex";
+import { Delivery } from "./delivery";
 
 interface Carrier {
   id: string;
   name: string;
   color: Color;
-  updateTracking: (trackingNumber: string) => Promise<Package[]>;
+  updateTracking: (delivery: Delivery) => Promise<Package[]>;
   ableToTrackRemotely: () => Promise<boolean>;
 }
 
