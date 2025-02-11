@@ -25,14 +25,17 @@ export default function EditDeliveryView({
   isLoading: boolean;
   setPackages: (value: ((prevState: PackageMap) => PackageMap) | PackageMap) => void;
 }) {
-
   const { pop } = useNavigation();
 
   const [showDatePicker, setShowDatePicker] = useState(false);
 
   const { handleSubmit, itemProps } = useForm<EditDeliveryForm>({
     onSubmit: async (deliveryForm) => {
-      if (delivery.trackingNumber !== deliveryForm.trackingNumber || delivery.carrier !== deliveryForm.carrier || delivery.manualDeliveryDate !== deliveryForm.manualDeliveryDate) {
+      if (
+        delivery.trackingNumber !== deliveryForm.trackingNumber ||
+        delivery.carrier !== deliveryForm.carrier ||
+        delivery.manualDeliveryDate !== deliveryForm.manualDeliveryDate
+      ) {
         // clear packages for this delivery so it will refresh
         setPackages((packages) => {
           delete packages[delivery.id];
@@ -72,7 +75,7 @@ export default function EditDeliveryView({
   const handleCarrierChange = async (carrierId: string) => {
     const carrier = carriers.get(carrierId);
 
-    const shouldShowDatePicker = carrier === undefined ? true : !await carrier.ableToTrackRemotely();
+    const shouldShowDatePicker = carrier === undefined ? true : !(await carrier.ableToTrackRemotely());
     setShowDatePicker(shouldShowDatePicker);
   };
 

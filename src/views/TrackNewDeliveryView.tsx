@@ -21,14 +21,12 @@ export default function TrackNewDeliveryView({
   setDeliveries: (value: Delivery[]) => Promise<void>;
   isLoading: boolean;
 }) {
-
   const { pop } = useNavigation();
 
   const [showDatePicker, setShowDatePicker] = useState(false);
 
   const { handleSubmit, itemProps } = useForm<AddDeliveryForm>({
     onSubmit: async (deliveryForm) => {
-
       const delivery: Delivery = {
         id: randomUUID().toString(),
         name: deliveryForm.name,
@@ -57,7 +55,7 @@ export default function TrackNewDeliveryView({
   const handleCarrierChange = async (carrierId: string) => {
     const carrier = carriers.get(carrierId);
 
-    const shouldShowDatePicker = carrier === undefined ? true : !await carrier.ableToTrackRemotely();
+    const shouldShowDatePicker = carrier === undefined ? true : !(await carrier.ableToTrackRemotely());
     setShowDatePicker(shouldShowDatePicker);
   };
 

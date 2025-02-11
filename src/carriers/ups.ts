@@ -9,7 +9,6 @@ const cacheKey = "upsLogin";
 const host = "onlinetools.ups.com";
 
 export async function ableToTrackUpsRemotely(): Promise<boolean> {
-
   const preferences = getPreferenceValues<Preferences.TrackDeliveries>();
   const clientId = preferences.upsClientId;
   const clientSecret = preferences.upsClientSecret;

@@ -13,9 +13,11 @@ export async function updateUspsTracking(delivery: Delivery): Promise<Package[]>
 
   console.log(`Updated tracking for ${trackingNumber}`);
 
-  return [{
-    delivered: new Date() === delivery.manualDeliveryDate,
-    deliveryDate: delivery.manualDeliveryDate,
-    activity: [],
-  }];
+  return [
+    {
+      delivered: new Date() === delivery.manualDeliveryDate,
+      deliveryDate: delivery.manualDeliveryDate,
+      activity: [],
+    },
+  ];
 }

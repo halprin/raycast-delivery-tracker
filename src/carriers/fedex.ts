@@ -8,7 +8,6 @@ const cacheKey = "fedexLogin";
 const host = "apis.fedex.com";
 
 export async function ableToTrackFedexRemotely(): Promise<boolean> {
-
   const preferences = getPreferenceValues<Preferences.TrackDeliveries>();
   const apiKey = preferences.fedexApiKey;
   const secretKey = preferences.fedexSecretKey;

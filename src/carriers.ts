@@ -2,7 +2,7 @@ import { Color } from "@raycast/api";
 import { Package } from "./package";
 import { updateUspsTracking, ableToTrackUspsRemotely } from "./carriers/usps";
 import { updateUpsTracking, ableToTrackUpsRemotely } from "./carriers/ups";
-import { updateFedexTracking, ableToTrackFedexRemotely} from "./carriers/fedex";
+import { updateFedexTracking, ableToTrackFedexRemotely } from "./carriers/fedex";
 import { Delivery } from "./delivery";
 
 interface Carrier {
