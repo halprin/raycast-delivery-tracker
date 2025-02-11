@@ -11,7 +11,7 @@ interface Carrier {
   color: Color;
   updateTracking: (delivery: Delivery) => Promise<Package[]>;
   ableToTrackRemotely: () => Promise<boolean>;
-  urlToTrackingWebpage: (delivery: Delivery) => Promise<string>;
+  urlToTrackingWebpage: (delivery: Delivery) => string;
 }
 
 const carriers: Carrier[] = [

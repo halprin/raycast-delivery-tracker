@@ -15,7 +15,7 @@ export async function ableToTrackFedexRemotely(): Promise<boolean> {
   return Boolean(apiKey && secretKey);
 }
 
-export async function urlToFedexTrackingWebpage(delivery: Delivery): Promise<string> {
+export function urlToFedexTrackingWebpage(delivery: Delivery): string {
   return `https://www.fedex.com/wtrk/track/?action=track&tracknumbers=${delivery.trackingNumber}`;
 }
 
