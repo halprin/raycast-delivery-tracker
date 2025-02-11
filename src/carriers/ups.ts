@@ -7,7 +7,16 @@ const cache = new Cache();
 const cacheKey = "upsLogin";
 const host = "onlinetools.ups.com";
 
-async function updateUpsTracking(trackingNumber: string): Promise<Package[]> {
+export async function ableToTrackUpsRemotely(): Promise<boolean> {
+
+  const preferences = getPreferenceValues<Preferences.TrackDeliveries>();
+  const clientId = preferences.upsClientId;
+  const clientSecret = preferences.upsClientSecret;
+
+  return Boolean(clientId && clientSecret);
+}
+
+export async function updateUpsTracking(trackingNumber: string): Promise<Package[]> {
   console.log(`Updating tracking for ${trackingNumber}`);
 
   const preferences = getPreferenceValues<Preferences.TrackDeliveries>();
@@ -172,5 +181,3 @@ function convertUpsDateToDate(upsDate: string | undefined): Date | undefined {
 
   return new Date(year, month, day);
 }
-
-export default updateUpsTracking;

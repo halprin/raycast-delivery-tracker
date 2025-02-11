@@ -6,7 +6,12 @@ const cache = new Cache();
 const cacheKey = "uspsLogin";
 const host = "api.usps.com";
 
-async function updateUspsTracking(trackingNumber: string): Promise<Package[]> {
+export async function ableToTrackUspsRemotely(): Promise<boolean> {
+  // doesn't support remote tracking yet.
+  return false;
+}
+
+export async function updateUspsTracking(trackingNumber: string): Promise<Package[]> {
   console.log(`Updating tracking for ${trackingNumber}`);
 
   const preferences = getPreferenceValues<Preferences.TrackDeliveries>();
@@ -179,5 +184,3 @@ function convertUspsTrackingToPackages(upsTrackingInfo: UspsTrackingInfo): Packa
   //     };
   //   });
 }
-
-export default updateUspsTracking;
