@@ -10,17 +10,9 @@ carrier, which allows you to be in charge of your privacy.
 
 ## Supported Carriers
 
-### United States Postal Service (USPS)
-
-In the settings, you'll need two things to access the USPS API.
-- Consumer key.
-- Consumer secret.
-
-Navigate to the [USPS Developer Portal](https://developer.usps.com/) and walk through the getting started steps.
-
-Do not do the steps in the Customer Access Testing (CAT) environment, or you will get incorrect tracking information.
-The name of the app can be anything and is only for you.  You do not need a callback URL.  As outlined in their steps,
-you will need to contact their [API support](mailto:APISupport@usps.gov) to add access to the tracking API.
+A carrier can either support online updating of the tracking over the Internet or not.  You are able to specify a manual
+delivery date for a delivery from a carrier that does not support online updating or a carrier that's missing
+credentials.
 
 ### United Parcel Service (UPS)
 
@@ -47,11 +39,18 @@ Select the track API when creating the API project.  The name of the project can
 creating the project, you'll need to subsequently create the production key and use that in this extension.  Do not use
 the test key, or you'll get incorrect tracking information.  The name of the production key name can be anything.
 
+### United States Postal Service (USPS)
+
+While the USPS does support online updating of the tracking over the Internet, they only seem to allow large enterprise
+companies or companies that will also be actively sending packages.  Therefore, I have not been able to verify code that
+works, so the USPS carrier only supports setting manual delivery dates for now.
+
 ## Contributing
 
 Feel free to file an issue or fork and PR on the
 [original repository](https://github.com/halprin/raycast-delivery-tracker) or through the
-[main extension repository](https://github.com/raycast/extensions) workflow.
+[main extension repository](https://github.com/raycast/extensions)
+[workflow](https://developers.raycast.com/basics/contribute-to-an-extension).
 
 If you are adding support for a new carrier, you can take inspiration from the [existing carriers](./src/carriers).
 Please update the documentation here on how one signs-up for the carrier and gets any API keys.
