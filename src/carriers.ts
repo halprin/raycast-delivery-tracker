@@ -1,8 +1,8 @@
 import { Color } from "@raycast/api";
 import { Package } from "./package";
-import { updateUspsTracking, ableToTrackUspsRemotely } from "./carriers/usps";
-import { updateUpsTracking, ableToTrackUpsRemotely } from "./carriers/ups";
-import { updateFedexTracking, ableToTrackFedexRemotely } from "./carriers/fedex";
+import { updateUspsTracking, ableToTrackUspsRemotely, urlToUspsTrackingWebpage } from "./carriers/usps";
+import { updateUpsTracking, ableToTrackUpsRemotely, urlToUpsTrackingWebpage } from "./carriers/ups";
+import { updateFedexTracking, ableToTrackFedexRemotely, urlToFedexTrackingWebpage } from "./carriers/fedex";
 import { Delivery } from "./delivery";
 
 interface Carrier {
@@ -11,6 +11,7 @@ interface Carrier {
   color: Color;
   updateTracking: (delivery: Delivery) => Promise<Package[]>;
   ableToTrackRemotely: () => Promise<boolean>;
+  urlToTrackingWebpage: (delivery: Delivery) => Promise<string>;
 }
 
 const carriers: Carrier[] = [
@@ -20,6 +21,7 @@ const carriers: Carrier[] = [
     color: Color.Blue,
     updateTracking: updateUspsTracking,
     ableToTrackRemotely: ableToTrackUspsRemotely,
+    urlToTrackingWebpage: urlToUspsTrackingWebpage,
   },
   {
     id: "ups",
@@ -27,6 +29,7 @@ const carriers: Carrier[] = [
     color: Color.Orange,
     updateTracking: updateUpsTracking,
     ableToTrackRemotely: ableToTrackUpsRemotely,
+    urlToTrackingWebpage: urlToUpsTrackingWebpage,
   },
   {
     id: "fedex",
@@ -34,6 +37,7 @@ const carriers: Carrier[] = [
     color: Color.Purple,
     updateTracking: updateFedexTracking,
     ableToTrackRemotely: ableToTrackFedexRemotely,
+    urlToTrackingWebpage: urlToFedexTrackingWebpage,
   },
 ];
 

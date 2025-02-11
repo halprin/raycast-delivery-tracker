@@ -16,6 +16,10 @@ export async function ableToTrackUpsRemotely(): Promise<boolean> {
   return Boolean(clientId && clientSecret);
 }
 
+export async function urlToUpsTrackingWebpage(delivery: Delivery): Promise<string> {
+  return `https://www.ups.com/track?tracknum=${delivery.trackingNumber}`;
+}
+
 export async function updateUpsTracking(delivery: Delivery): Promise<Package[]> {
   const trackingNumber = delivery.trackingNumber;
 
