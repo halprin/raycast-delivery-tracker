@@ -3,11 +3,13 @@ import carriers from "../carriers";
 import { FormValidation, useForm } from "@raycast/utils";
 import { Delivery } from "../delivery";
 import { randomUUID } from "node:crypto";
+import { useState } from "react";
 
 interface AddDeliveryForm {
   name: string;
   carrier: string;
   trackingNumber: string;
+  manualDeliveryDate?: Date;
 }
 
 export default function TrackNewDeliveryView({
@@ -21,6 +23,8 @@ export default function TrackNewDeliveryView({
 }) {
   const { pop } = useNavigation();
 
+  const [showDatePicker, setShowDatePicker] = useState(false);
+
   const { handleSubmit, itemProps } = useForm<AddDeliveryForm>({
     onSubmit: async (deliveryForm) => {
       const delivery: Delivery = {
@@ -28,6 +32,7 @@ export default function TrackNewDeliveryView({
         name: deliveryForm.name,
         trackingNumber: deliveryForm.trackingNumber,
         carrier: deliveryForm.carrier,
+        manualDeliveryDate: deliveryForm.manualDeliveryDate,
       };
       await setDeliveries((deliveries || []).concat(delivery));
 
@@ -43,8 +48,16 @@ export default function TrackNewDeliveryView({
       name: FormValidation.Required,
       carrier: FormValidation.Required,
       trackingNumber: FormValidation.Required,
+      manualDeliveryDate: undefined,
     },
   });
+
+  const handleCarrierChange = async (carrierId: string) => {
+    const carrier = carriers.get(carrierId);
+
+    const shouldShowDatePicker = carrier === undefined ? true : !(await carrier.ableToTrackRemotely());
+    setShowDatePicker(shouldShowDatePicker);
+  };
 
   return (
     <Form
@@ -57,7 +70,7 @@ export default function TrackNewDeliveryView({
     >
       <Form.Description text="Fill in the details of the delivery you want to track." />
       <Form.TextField title="Name" placeholder="Name for the delivery" {...itemProps.name} />
-      <Form.Dropdown title="Carrier" {...itemProps.carrier}>
+      <Form.Dropdown title="Carrier" {...itemProps.carrier} onChange={handleCarrierChange}>
         {Array.from(carriers.values()).map((carrier) => (
           <Form.Dropdown.Item key={carrier.id} value={carrier.id} title={carrier.name} />
         ))}
@@ -67,6 +80,14 @@ export default function TrackNewDeliveryView({
         placeholder="Tracking number from the carrier"
         {...itemProps.trackingNumber}
       />
+      {showDatePicker && (
+        <Form.DatePicker
+          title="Manual delivery date"
+          info="This carrier doesn't support updating the tracking over the Internet yet.  Set a delivery date manually."
+          type={Form.DatePicker.Type.Date}
+          {...itemProps.manualDeliveryDate}
+        />
+      )}
     </Form>
   );
 }

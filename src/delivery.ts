@@ -3,5 +3,6 @@ export interface Delivery {
   name: string;
   trackingNumber: string;
   carrier: string;
+  manualDeliveryDate?: Date;
   debug?: boolean;
 }

@@ -1,12 +1,23 @@
 import { Package } from "../package";
 import { Cache, getPreferenceValues } from "@raycast/api";
 import fetch from "node-fetch";
+import { Delivery } from "../delivery";
 
 const cache = new Cache();
 const cacheKey = "fedexLogin";
 const host = "apis.fedex.com";
 
-async function updateFedexTracking(trackingNumber: string): Promise<Package[]> {
+export async function ableToTrackFedexRemotely(): Promise<boolean> {
+  const preferences = getPreferenceValues<Preferences.TrackDeliveries>();
+  const apiKey = preferences.fedexApiKey;
+  const secretKey = preferences.fedexSecretKey;
+
+  return Boolean(apiKey && secretKey);
+}
+
+export async function updateFedexTracking(delivery: Delivery): Promise<Package[]> {
+  const trackingNumber = delivery.trackingNumber;
+
   console.log(`Updating tracking for ${trackingNumber}`);
 
   const preferences = getPreferenceValues<Preferences.TrackDeliveries>();
@@ -180,5 +191,3 @@ function convertFedexDateToDate(fedexDate: string | undefined): Date | undefined
   // fedexDate is an ISO date formatted string
   return new Date(fedexDate);
 }
-
-export default updateFedexTracking;

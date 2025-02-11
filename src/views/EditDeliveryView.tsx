@@ -3,11 +3,13 @@ import carriers from "../carriers";
 import { FormValidation, useForm } from "@raycast/utils";
 import { Delivery } from "../delivery";
 import { PackageMap } from "../package";
+import { useState } from "react";
 
 interface EditDeliveryForm {
   name: string;
   carrier: string;
   trackingNumber: string;
+  manualDeliveryDate?: Date;
 }
 
 export default function EditDeliveryView({
@@ -25,9 +27,15 @@ export default function EditDeliveryView({
 }) {
   const { pop } = useNavigation();
 
+  const [showDatePicker, setShowDatePicker] = useState(false);
+
   const { handleSubmit, itemProps } = useForm<EditDeliveryForm>({
     onSubmit: async (deliveryForm) => {
-      if (delivery.trackingNumber !== deliveryForm.trackingNumber || delivery.carrier !== deliveryForm.carrier) {
+      if (
+        delivery.trackingNumber !== deliveryForm.trackingNumber ||
+        delivery.carrier !== deliveryForm.carrier ||
+        delivery.manualDeliveryDate !== deliveryForm.manualDeliveryDate
+      ) {
         // clear packages for this delivery so it will refresh
         setPackages((packages) => {
           delete packages[delivery.id];
@@ -38,6 +46,7 @@ export default function EditDeliveryView({
       delivery.name = deliveryForm.name;
       delivery.trackingNumber = deliveryForm.trackingNumber;
       delivery.carrier = deliveryForm.carrier;
+      delivery.manualDeliveryDate = deliveryForm.manualDeliveryDate;
 
       await setDeliveries(deliveries);
 
@@ -53,13 +62,22 @@ export default function EditDeliveryView({
       name: delivery.name,
       carrier: delivery.carrier,
       trackingNumber: delivery.trackingNumber,
+      manualDeliveryDate: delivery.manualDeliveryDate,
     },
     validation: {
       name: FormValidation.Required,
       carrier: FormValidation.Required,
       trackingNumber: FormValidation.Required,
+      manualDeliveryDate: undefined,
     },
   });
+
+  const handleCarrierChange = async (carrierId: string) => {
+    const carrier = carriers.get(carrierId);
+
+    const shouldShowDatePicker = carrier === undefined ? true : !(await carrier.ableToTrackRemotely());
+    setShowDatePicker(shouldShowDatePicker);
+  };
 
   return (
     <Form
@@ -72,7 +90,7 @@ export default function EditDeliveryView({
     >
       <Form.Description text="Edit the details of the delivery." />
       <Form.TextField title="Name" placeholder="Name for the delivery" {...itemProps.name} />
-      <Form.Dropdown title="Carrier" {...itemProps.carrier}>
+      <Form.Dropdown title="Carrier" {...itemProps.carrier} onChange={handleCarrierChange}>
         {Array.from(carriers.values()).map((carrier) => (
           <Form.Dropdown.Item key={carrier.id} value={carrier.id} title={carrier.name} />
         ))}
@@ -82,6 +100,14 @@ export default function EditDeliveryView({
         placeholder="Tracking number from the carrier"
         {...itemProps.trackingNumber}
       />
+      {showDatePicker && (
+        <Form.DatePicker
+          title="Manual delivery date"
+          info="This carrier doesn't support updating the tracking over the Internet yet.  Set a delivery date manually."
+          type={Form.DatePicker.Type.Date}
+          {...itemProps.manualDeliveryDate}
+        />
+      )}
     </Form>
   );
 }
