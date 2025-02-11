@@ -61,10 +61,10 @@ export default function TrackDeliveriesCommand() {
     >
       {(deliveries ?? []).length === 0 ? (
         <List.EmptyView
-          icon={"extension-icon.png"}
+          icon="extension-icon.png"
           title="No Deliveries"
           description={
-            "Track a new delivery ⏎, and don't forget to fill in the API keys for the used carriers in the extension settings."
+            "Track a new delivery ⏎!  Fill in the API keys for the used carriers in the extension settings, or you can start by setting manual delivery dates."
           }
         />
       ) : (
