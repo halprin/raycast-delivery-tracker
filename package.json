@@ -79,6 +79,7 @@
   },
   "scripts": {
     "build": "ray build",
+    "build-dist": "ray build -e dist",
     "dev": "ray develop",
     "fix-lint": "ray lint --fix",
     "lint": "ray lint",
