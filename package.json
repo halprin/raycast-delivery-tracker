@@ -14,21 +14,24 @@
     "package",
     "packages",
     "parcel",
-    "parcels"
+    "parcels",
+    "USPS",
+    "UPS",
+    "FedEx"
   ],
   "license": "MIT",
   "commands": [
     {
       "name": "track-deliveries",
       "title": "Track Deliveries",
-      "subtitle": "Deliveries, packages, and parcels",
+      "subtitle": "Delivery Tracker",
       "description": "View the deliveries you're tracking.",
       "mode": "view"
     },
     {
       "name": "track-new-delivery",
       "title": "Track New Delivery",
-      "subtitle": "Deliveries, packages, and parcels",
+      "subtitle": "Delivery Tracker",
       "description": "Starts tracking a new delivery.",
       "mode": "view"
     }

@@ -20,7 +20,7 @@ export interface PackageMap {
 }
 
 export function deliveryIcon(packages?: Package[]): Icon {
-  if (!packages || packages.length == 0) {
+  if (!packages || packages.length === 0) {
     // there are no packages for this tracking, possible before data has been gotten from API
     return Icon.QuestionMarkCircle;
   }
@@ -43,7 +43,7 @@ export function deliveryIcon(packages?: Package[]): Icon {
 export function deliveryStatus(packages?: Package[]): { value: string; color?: Color } {
   // check whether all, some, or no packages in a track are delivered
 
-  if (!packages || packages.length == 0) {
+  if (!packages || packages.length === 0) {
     return {
       value: "No packages",
       color: Color.Orange,
@@ -63,12 +63,13 @@ export function deliveryStatus(packages?: Package[]): { value: string; color?: C
     };
   }
 
-  //find closest estimated delivered package
+  // find closest estimated delivered package
   const closestPackage = getPackageWithEarliestDeliveryDate(packages);
 
   let accessoryText = "En route";
-  if (closestPackage.deliveryDate) {
-    accessoryText = calculateDayDifference(closestPackage.deliveryDate).toString() + " days until delivery";
+  if (closestPackage?.deliveryDate) {
+    const now = new Date();
+    accessoryText = calculateDayDifference(closestPackage.deliveryDate, now).toString() + " days until delivery";
   }
 
   let accessoryColor = undefined;
@@ -83,7 +84,11 @@ export function deliveryStatus(packages?: Package[]): { value: string; color?: C
   };
 }
 
-export function getPackageWithEarliestDeliveryDate(packages: Package[]): Package {
+export function getPackageWithEarliestDeliveryDate(packages: Package[]): Package | null {
+  if (packages.length === 0) {
+    return null;
+  }
+
   const now = new Date();
 
   return packages.reduce((closest, current) => {
@@ -110,10 +115,10 @@ export function getPackageWithEarliestDeliveryDate(packages: Package[]): Package
   });
 }
 
-export function calculateDayDifference(deliverDate: Date): number {
+export function calculateDayDifference(deliveryDate: Date, comparisonDate: Date): number {
   const millisecondsInDay = 1000 * 60 * 60 * 24;
 
-  const millisecondsDifference = deliverDate.getTime() - new Date().getTime();
+  const millisecondsDifference = deliveryDate.getTime() - comparisonDate.getTime();
   let dayDifference = Math.ceil(millisecondsDifference / millisecondsInDay);
 
   if (dayDifference < 0) {

@@ -7,6 +7,7 @@ import { Delivery } from "../delivery";
 const cache = new Cache();
 const cacheKey = "upsLogin";
 const host = "onlinetools.ups.com";
+const deliveredStatusCode = "011";
 
 export async function ableToTrackUpsRemotely(): Promise<boolean> {
   const preferences = getPreferenceValues<Preferences.TrackDeliveries>();
@@ -67,7 +68,7 @@ async function loginWithCachedData(clientId: string, clientSecret: string): Prom
     loginResponse = JSON.parse(cache.get(cacheKey) ?? "{}");
 
     if (Number(loginResponse.issued_at) + Number(loginResponse.expires_in) * 1000 < new Date().getTime() + 30 * 1000) {
-      // we are less than 30 seconds form the access token expiring
+      // we are less than 30 seconds from the access token expiring
       console.log("Access key expired; logging into UPS");
       loginResponse = await login(clientId, clientSecret);
 
@@ -82,7 +83,7 @@ async function login(clientId: string, clientSecret: string): Promise<LoginRespo
   const response = await fetch(`https://${host}/security/v1/oauth/token`, {
     method: "POST",
     headers: {
-      Authorization: "Basic " + btoa(clientId + ":" + clientSecret),
+      Authorization: "Basic " + Buffer.from(clientId + ":" + clientSecret).toString("base64"),
       "Content-Type": "application/x-www-form-urlencoded",
     },
     body: new URLSearchParams({
@@ -153,7 +154,7 @@ async function track(trackingNumber: string, accessToken: string): Promise<UpsTr
 
   const trackingResponse = (await response.json()) as UpsTrackingInfo;
   if (!trackingResponse) {
-    console.log("Failed to parse UPS login response");
+    console.log("Failed to parse UPS tracking response");
     throw new Error("Failed to parse UPS track response.  Please file a bug report.");
   }
 
@@ -169,7 +170,7 @@ function convertUpsTrackingToPackages(upsTrackingInfo: UpsTrackingInfo): Package
       const scheduledDeliveryDate = aPackage.deliveryDate.find((deliveryDate) => deliveryDate.type === "SDD")?.date;
 
       return {
-        delivered: aPackage.currentStatus.code === "011",
+        delivered: aPackage.currentStatus.code === deliveredStatusCode,
         deliveryDate: convertUpsDateToDate(deliveryDate || rescheduledDeliveryDate || scheduledDeliveryDate),
         activity: [],
       };

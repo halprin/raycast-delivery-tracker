@@ -1,8 +1,12 @@
 # Delivery Tracker Changelog
 
-## [Initial Release] - {PR_MERGE_DATE}
+## [Initial Release] - 2025-03-04
 
-The initial release.  Has support for...
+Tracks deliveries, packages, and parcels.
+
+Has two commands to start: one to add a new delivery and one to view all the deliveries you're tracking.
+
+Has initial support for the following carriers...
 - UPS.
 - FedEx.
 - USPS.
