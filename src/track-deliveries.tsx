@@ -41,12 +41,6 @@ export default function TrackDeliveriesCommand() {
   const [trackingIsLoading, setTrackingIsLoading] = useState(false);
 
   useEffect(() => {
-    if (!deliveries || !packages) {
-      // don't do anything until both deliveries and packages are initialized
-      return;
-    }
-
-    setTrackingIsLoading(true);
     refreshTracking(false, deliveries, packages, setPackages, setTrackingIsLoading);
   }, [deliveries]);
 
@@ -114,7 +108,7 @@ export default function TrackDeliveriesCommand() {
                   icon={Icon.Trash}
                   shortcut={Keyboard.Shortcut.Common.Remove}
                   style={Action.Style.Destructive}
-                  onAction={() => deleteTracking(delivery.id, deliveries, setDeliveries)}
+                  onAction={() => deleteTracking(delivery.id, deliveries, setDeliveries, setPackages)}
                 />
                 <TrackNewDeliveryAction deliveries={deliveries} setDeliveries={setDeliveries} isLoading={isLoading} />
                 <Action
@@ -123,12 +117,6 @@ export default function TrackDeliveriesCommand() {
                   shortcut={Keyboard.Shortcut.Common.Refresh}
                   style={Action.Style.Regular}
                   onAction={() => {
-                    if (!deliveries || !packages) {
-                      // don't do anything until both deliveries and packages are initialized
-                      return;
-                    }
-
-                    setTrackingIsLoading(true);
                     refreshTracking(true, deliveries, packages, setPackages, setTrackingIsLoading);
                   }}
                 />
@@ -143,11 +131,18 @@ export default function TrackDeliveriesCommand() {
 
 async function refreshTracking(
   forceRefresh: boolean,
-  deliveries: Delivery[],
+  deliveries: Delivery[] | undefined,
   packages: PackageMap,
   setPackages: (value: ((prevState: PackageMap) => PackageMap) | PackageMap) => void,
   setTrackingIsLoading: (value: ((prevState: boolean) => boolean) | boolean) => void,
 ) {
+  if (!deliveries || !packages) {
+    // don't do anything until both deliveries and packages are initialized
+    return;
+  }
+
+  setTrackingIsLoading(true);
+
   const now = new Date();
 
   for (const delivery of deliveries.filter((delivery) => !delivery.debug)) {
@@ -176,11 +171,13 @@ async function refreshTracking(
       const refreshedPackages = await carrier.updateTracking(delivery);
 
       setPackages((packagesMap) => {
-        packagesMap[delivery.id] = {
-          packages: refreshedPackages,
-          lastUpdated: now,
+        return {
+          ...packagesMap,
+          [delivery.id]: {
+            packages: refreshedPackages,
+            lastUpdated: now,
+          },
         };
-        return packagesMap;
       });
     } catch (error) {
       await showToast({
@@ -196,18 +193,19 @@ async function refreshTracking(
 
 async function deleteTracking(
   id: string,
-  tracking: Delivery[] | undefined,
-  setTracking: (value: Delivery[]) => Promise<void>,
+  deliveries: Delivery[] | undefined,
+  setDeliveries: (value: Delivery[]) => Promise<void>,
+  setPackages: (value: ((prevState: PackageMap) => PackageMap) | PackageMap) => void,
 ) {
-  if (!tracking) {
+  if (!deliveries) {
     return;
   }
 
-  const nameOfTrackToDelete = tracking.find((track) => track.id === id)?.name ?? "Unknown";
+  const nameOfDeliveryToDelete = deliveries.find((delivery) => delivery.id === id)?.name ?? "Unknown";
 
   const options: Alert.Options = {
     title: "Delete Delivery",
-    message: `Are you sure you want to delete ${nameOfTrackToDelete}?`,
+    message: `Are you sure you want to delete ${nameOfDeliveryToDelete}?`,
     icon: Icon.Trash,
     primaryAction: {
       title: "Delete",
@@ -220,13 +218,17 @@ async function deleteTracking(
     return;
   }
 
-  const reducedTracking = tracking.filter((track) => track.id !== id);
-  await setTracking(reducedTracking);
+  const reducedDeliveries = deliveries.filter((delivery) => delivery.id !== id);
+  await setDeliveries(reducedDeliveries);
+  setPackages((packages) => {
+    delete packages[id];
+    return packages;
+  });
 
   await showToast({
     style: Toast.Style.Success,
     title: "Deleted Delivery",
-    message: nameOfTrackToDelete,
+    message: nameOfDeliveryToDelete,
   });
 }
 
@@ -257,8 +259,11 @@ function sortTracking(tracks: Delivery[], packages: PackageMap): Delivery[] {
       return 1;
     }
 
-    const aEarliestDeliveryDate = getPackageWithEarliestDeliveryDate(aPackages).deliveryDate;
-    const bEarliestDeliveryDate = getPackageWithEarliestDeliveryDate(bPackages).deliveryDate;
+    const aEarliestDeliveryDate = getPackageWithEarliestDeliveryDate(aPackages)?.deliveryDate;
+    const bEarliestDeliveryDate = getPackageWithEarliestDeliveryDate(bPackages)?.deliveryDate;
+
+    const aSomePackagesDelivered = aPackages.some((aPackage) => aPackage.delivered);
+    const bSomePackagesDelivered = bPackages.some((bPackage) => bPackage.delivered);
 
     if (aEarliestDeliveryDate && !bEarliestDeliveryDate) {
       // a has a delivery date, and b doesn't
@@ -268,9 +273,6 @@ function sortTracking(tracks: Delivery[], packages: PackageMap): Delivery[] {
       return 1;
     } else if (!aEarliestDeliveryDate && !bEarliestDeliveryDate) {
       // a doesn't have a delivery date, and b doesn't either
-
-      const aSomePackagesDelivered = aPackages.some((aPackage) => aPackage.delivered);
-      const bSomePackagesDelivered = bPackages.some((bPackage) => bPackage.delivered);
 
       if (aSomePackagesDelivered && !bSomePackagesDelivered) {
         // a has some packages delivered, and b doesn't
@@ -284,13 +286,11 @@ function sortTracking(tracks: Delivery[], packages: PackageMap): Delivery[] {
       return 0;
     }
 
+    const now = new Date();
     const dayDifferenceDifference =
-      calculateDayDifference(aEarliestDeliveryDate!) - calculateDayDifference(bEarliestDeliveryDate!);
+      calculateDayDifference(aEarliestDeliveryDate!, now) - calculateDayDifference(bEarliestDeliveryDate!, now);
     if (dayDifferenceDifference === 0) {
       // both tracks tie for earliest delivery
-
-      const aSomePackagesDelivered = aPackages.some((aPackage) => aPackage.delivered);
-      const bSomePackagesDelivered = bPackages.some((bPackage) => bPackage.delivered);
 
       if (aSomePackagesDelivered && !bSomePackagesDelivered) {
         // a has some packages delivered, and b doesn't

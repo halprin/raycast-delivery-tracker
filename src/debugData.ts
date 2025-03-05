@@ -44,6 +44,13 @@ export const debugDeliveries: Delivery[] = [
     carrier: "fedex",
     debug: true,
   },
+  {
+    id: "DD17AC8D-9048-43ED-AF35-4195A2F97243",
+    name: "no packages",
+    trackingNumber: "198451726304587",
+    carrier: "fedex",
+    debug: true,
+  },
 ];
 
 export const debugPackages: PackageMap = {};
@@ -91,12 +98,12 @@ debugPackages[debugDeliveries[4].id] = {
       activity: [],
     },
     {
-      deliveryDate: new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 4), // 2 days ahead
+      deliveryDate: new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 2), // 2 days ahead
       delivered: false,
       activity: [],
     },
     {
-      deliveryDate: new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 4), // 1 days ahead
+      deliveryDate: new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 1), // 1 day ahead
       delivered: true,
       activity: [],
     },
@@ -120,4 +127,7 @@ debugPackages[debugDeliveries[5].id] = {
       activity: [],
     },
   ],
+};
+debugPackages[debugDeliveries[6].id] = {
+  packages: [],
 };

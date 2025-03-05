@@ -36,9 +36,9 @@ export async function updateFedexTracking(delivery: Delivery): Promise<Package[]
   const loginResponse = await loginWithCachedData(apiKey, secretKey);
 
   console.log("Calling FedEx tracking");
-  const upsTrackingInfo = await track(trackingNumber, loginResponse.access_token);
+  const fedexTrackingInfo = await track(trackingNumber, loginResponse.access_token);
 
-  const packages = convertUpsTrackingToPackages(upsTrackingInfo);
+  const packages = convertFedexTrackingToPackages(fedexTrackingInfo);
 
   console.log(`Updated tracking for ${trackingNumber}`);
 
@@ -59,16 +59,24 @@ async function loginWithCachedData(apiKey: string, secretKey: string): Promise<L
     console.log("Logging into FedEx");
     loginResponse = await login(apiKey, secretKey);
 
+    // expires_in is in seconds and not a timestamp, e.g. `3599`.
+    // turn it into a timestamp for later validation.
+    loginResponse.expires_in = new Date().getTime() + loginResponse.expires_in * 1000;
+
     cache.set(cacheKey, JSON.stringify(loginResponse));
   } else {
     loginResponse = JSON.parse(cache.get(cacheKey) ?? "{}");
 
     const now = new Date().getTime();
 
-    if (now + loginResponse.expires_in * 1000 < now + 30 * 1000) {
-      // we are less than 30 seconds form the access token expiring
+    if (loginResponse.expires_in < now + 30 * 1000) {
+      // we are less than 30 seconds from the access token expiring
       console.log("Access key expired; logging into FedEx");
       loginResponse = await login(apiKey, secretKey);
+
+      // expires_in is in seconds and not a timestamp, e.g. `3599`.
+      // turn it into a timestamp for later validation.
+      loginResponse.expires_in = new Date().getTime() + loginResponse.expires_in * 1000;
 
       cache.set(cacheKey, JSON.stringify(loginResponse));
     }
@@ -158,14 +166,14 @@ async function track(trackingNumber: string, accessToken: string): Promise<Fedex
 
   const trackingResponse = (await response.json()) as FedexTrackingInfo;
   if (!trackingResponse) {
-    console.log("Failed to parse FedEx login response");
+    console.log("Failed to parse FedEx tracking response");
     throw new Error("Failed to parse FedEx track response.  Please file a bug report.");
   }
 
   return trackingResponse;
 }
 
-function convertUpsTrackingToPackages(fedexTrackingInfo: FedexTrackingInfo): Package[] {
+function convertFedexTrackingToPackages(fedexTrackingInfo: FedexTrackingInfo): Package[] {
   return fedexTrackingInfo.output.completeTrackResults
     .flatMap((results) => results.trackResults)
     .map((aPackage) => {
