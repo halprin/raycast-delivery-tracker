@@ -10,8 +10,8 @@ on:
 
 jobs:
 
-  integrate:
-    name: Integrate
+  lint:
+    name: Lint
     runs-on: ubuntu-latest
     steps:
 
@@ -22,8 +22,8 @@ jobs:
         node-version-file: package.json
         cache: npm
 
-    -  run: npm ci
+    - run: npm ci
 
     - run: npm run lint
 
-    - run: npm run build-dist
+    - run: npm run build
