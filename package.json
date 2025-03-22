@@ -78,7 +78,7 @@
     "prettier": "3.5.3",
     "typescript": "5.8.2",
     "node-fetch": "3.3.2",
-    "@raycast/migration": "1.93.0"
+    "@raycast/migration": "1.94.0"
   },
   "scripts": {
     "build": "ray build",
